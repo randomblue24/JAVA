@@ -1,14 +1,28 @@
-# Design Idea: Give a directory, and the script will go through every image type
-# and convert to type PNG
+
 from PIL import Image
 import os
 import pathlib
 from PIL import ImageFile
+from single import convert_sing
+
+# from the tkinter library
+import tkinter as Tk
+# import filedialog module
+#from tkinter import filedialog
+import tkinter.filedialog
+
+#from tkinter import * as tk
+#import tkinter as tk
+
 #Need this else, it stops because image file too big
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def convert(path, convert_type):
+
+# Design Idea: Give a directory, and the script will go through every image type
+# and convert to type PNG
+
+def convert_dir(path, convert_type):
 
     # scandir() takes an object with path mapped to iter(object, subclass)
     # scanning the directory linked for files that don't end with the name type you want
@@ -58,10 +72,10 @@ def convert(path, convert_type):
             image.save(file_name, convert_type)
             # closing the image we opened. Not sure if this is necessary
             # image.close()
+            print(file.name+" converted \n")
 
 
 def remove_origin(path, convert_type):
-
     # if user did not enter a '.'
     if not convert_type.find('.'):
         # convert_type2=convert_type
@@ -73,18 +87,42 @@ def remove_origin(path, convert_type):
             os.remove(file)
             print(file.name+" removed \n")
 
+#TK file.dialog file browser prompt
+def browser(option):
+    
+    if(option=='1'):
+        file_name = Tk.filedialog.askopenfilename(initialdir = "/",
+                                            title = "Select a File",
+                                            filetypes = (("Images",
+                                                            "*.JPG* *.PNG* *.JPEG* "),
+                                                        ))                                                                                        
+        return file_name
+    
+    elif(option=='2'):
+        folder_name = Tk.filedialog.askdirectory()                                                                                        
+        return folder_name   
+                                             
 
 def main():
-    path = input("Enter filepath: ")
-    convert_type = input("Enter convert type: ").upper()
-    delete = input("Delete old files? Enter Y or N: ").upper()
-    
-    if(delete == 'Y'):
-        convert(path, convert_type)
-        remove_origin(path, convert_type)
-    else:
-        convert(path, convert_type)
+    print("\nWelcome to Image Converter by Randomblue24. \nSupported File Types: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html \n\nSelect an option from the list: ")
+    choose=input("1: Convert a single Image \n2: Convert a folder of Images \n\nSelection: ")
+    delete = input("Delete old file(s) after conversion? Enter Y or N: ").upper()
 
-    
+    if(choose=='1'):
+        print("Browse to file location")
+        path = browser(choose)
+        convert_type = input("Enter convert type: ").upper()
+        convert_sing(path, convert_type)
+        
+    else:
+        if(choose=='2'):
+            print("Browse to folder location")
+            path = browser(choose)
+            convert_type = input("Enter convert type: ").upper()
+            convert_dir(path, convert_type)
+            
+    #if user wants to delete original files
+    if(delete=='Y'):
+        remove_origin(path, convert_type)
 
 main()
